@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaultCLI", "VaultCLI\VaultCLI.csproj", "{7281B57D-38FF-434B-BE49-5AB32F57CAAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7281B57D-38FF-434B-BE49-5AB32F57CAAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7281B57D-38FF-434B-BE49-5AB32F57CAAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7281B57D-38FF-434B-BE49-5AB32F57CAAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7281B57D-38FF-434B-BE49-5AB32F57CAAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87870635-7819-4DF1-979B-1653DEDB304C}
+	EndGlobalSection
+EndGlobal

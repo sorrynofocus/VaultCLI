@@ -13,6 +13,7 @@ using VaultSharp.V1.AuthMethods.UserPass;
 using VaultSharp.V1.AuthMethods.Okta;
 using VaultSharp.V1.Commons;
 using VaultSharp.V1.AuthMethods.Token.Models;
+using System.IO;
 
 namespace VaultCLI
 {
@@ -36,10 +37,41 @@ namespace VaultCLI
             oktaid
         };
 
+        
+
 
 
         public class GetVaultCreds
         {
+
+            public void DisplayKV(string sPath, string Key, string Value)
+            {
+                Console.WriteLine("\nPath={0}", sPath);
+                Console.WriteLine("\nKey (User)={0}\nValue (password)={1}", Key, Value);
+            }
+
+            public void ClientInfo (IVaultClient vaultClient)
+            {
+                //info on token
+                Secret<CallingTokenInfo> tokenData = vaultClient.V1.Auth.Token.LookupSelfAsync().Result;
+
+                int TimeToLive = tokenData.Data.TimeToLive;
+                string ClientToken = tokenData.Data.Id;
+                string DisplayName = tokenData.Data.DisplayName;
+                int CreationTime = tokenData.Data.CreationTime;
+
+                Console.WriteLine("\nToken Authentication Method.\nTime To Live:{0}\nClient Token:{1}\nCreation Time: {2}\nDisplay Name: {3}", EpochTimeStampToDate(TimeToLive), ClientToken, EpochTimeStampToDate(CreationTime), DisplayName);
+            }
+
+            public string EpochTimeStampToDate(double timeStamp)
+            {
+                //epochconverter.com
+                DateTime dt  = new DateTime(1970,1,1,0,0,0,0).AddSeconds(timeStamp).ToLocalTime();
+                return (dt.ToString("dd-MM-yyy"));
+                
+            }
+
+
             // VaultCLI https://server:port "token" "path" "secret"
             public void GetCredsByToken(string VaultURL, string Token, string Path, string mountPoint="secret")
             {
@@ -84,24 +116,15 @@ namespace VaultCLI
                     //}
 
                     //info on token
-                    Secret<CallingTokenInfo> tokenData = vaultClient.V1.Auth.Token.LookupSelfAsync().Result;
-
-                    int LeaseDurationSeconds = tokenData.LeaseDurationSeconds;
-                    var ClientToken = tokenData.AuthInfo.ClientToken;
-                    Console.WriteLine("\nToken Authentication Method.\nLease Duration in seconds:{0}\nClient Token:{1}", LeaseDurationSeconds.ToString(), ClientToken);
-
+                    ClientInfo(vaultClient);
 
                     Secret<SecretData> kv2Secret = vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: Path, mountPoint: mountPoint).Result;
 
-                    if (kv2Secret.Data.Data.Count ==1)
-                    {
-                        var keys = kv2Secret.Data.Data.Keys;
+                    ICollection<string> keys = kv2Secret.Data.Data.Keys;
 
-                        foreach(System.Collections.Generic.KeyValuePair<string, object> kvp in kv2Secret.Data.Data)
-                        {
-                            Console.WriteLine("\nPath={0}", mountPoint + Path);
-                            Console.WriteLine("\nKey (User)={0}\nValue (password)={1}", kvp.Key, kvp.Value);
-                        }
+                    foreach(System.Collections.Generic.KeyValuePair<string, object> kvp in kv2Secret.Data.Data)
+                    {
+                        DisplayKV(mountPoint + "/" + Path, kvp.Key, (string)kvp.Value);
                     }
                 }
                 catch(Exception exc)
@@ -109,11 +132,12 @@ namespace VaultCLI
                     if (exc.InnerException.Message.Contains("A connection attempt failed"))
                         Console.WriteLine("Cannot connect to server. Port is probably blocked");
 
-//                        Console.WriteLine(" -- {0} {1}", exc.GetType(), exc.Message);
+
 
                     if (exc.InnerException.Message.Contains("machine actively refused it"))
                         Console.WriteLine("No connection could be made because the target machine actively refused it. Faulty URL or port not in URL.");
 
+                    Console.WriteLine(" -- {0} {1}", exc.GetType(), exc.Message);
                 }
             } //End GetCredsByToken()
 
@@ -392,6 +416,7 @@ namespace VaultCLI
                     break;
 
                 case (int)AUTHENTICATION_METHOD.oktaid:
+                    getCredsTest.GetCredsByOktaID(sServer, sOktaID, sPassword, sPath, sPathMountPoint);
                     break;
 
                 default: Console.WriteLine("Use -? or --help. Inconsistent parameters.");

@@ -14,6 +14,7 @@ using VaultSharp.V1.AuthMethods.Okta;
 using VaultSharp.V1.Commons;
 using VaultSharp.V1.AuthMethods.Token.Models;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace VaultCLI
 {
@@ -405,7 +406,14 @@ namespace VaultCLI
 
             GetVaultCreds getCredsTest = new GetVaultCreds();
 
-            switch(iAuthentication)
+            //Let's deterct if user set VAULT_TOKEN. If so, change auth method to token
+            if (!String.IsNullOrEmpty( Environment.GetEnvironmentVariable("VAULT_TOKEN") ) )
+            {
+                iAuthentication = (int)AUTHENTICATION_METHOD.token;
+                sToken = Environment.GetEnvironmentVariable("VAULT_TOKEN").Trim().Replace("\"", "");
+            }
+
+            switch (iAuthentication)
             {
                 case (int)AUTHENTICATION_METHOD.token:
                     getCredsTest.GetCredsByToken(sServer, sToken, sPath, sPathMountPoint);
@@ -419,7 +427,7 @@ namespace VaultCLI
                     getCredsTest.GetCredsByOktaID(sServer, sOktaID, sPassword, sPath, sPathMountPoint);
                     break;
 
-                default: Console.WriteLine("Use -? or --help. Inconsistent parameters.");
+                default: Console.WriteLine("Use -? or --help. Inconsistent parameters for authentication.");
                     break;
             }
 

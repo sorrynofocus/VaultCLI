@@ -1,8 +1,7 @@
 {
   "profiles": {
     "VaultCLI": {
-      "commandName": "Project",
-      "commandLineArgs": "--help"
+      "commandName": "Project"
     }
   }
 }
